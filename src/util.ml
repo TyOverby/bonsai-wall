@@ -16,7 +16,7 @@ let or_log t =
   | Error (`Msg e) -> Sdl.log "%s" e
 ;;
 
-let low ~size:(fw, fh) ~init ~f =
+let low ~size:(fw, fh) ~init ~after_display ~f =
   Printexc.record_backtrace true;
   or_raise (Sdl.init Sdl.Init.video);
   or_raise (Sdl.gl_set_attribute Sdl.Gl.depth_size 24);
@@ -49,14 +49,15 @@ let low ~size:(fw, fh) ~init ~f =
     Gl.enable Gl.cull_face_enum;
     Gl.disable Gl.depth_test;
     f ~context ~sw ~sh loaded;
-    Sdl.gl_swap_window window
+    Sdl.gl_swap_window window;
+    after_display loaded
   done;
   Sdl.gl_delete_context ctx;
   Sdl.destroy_window window;
   Sdl.quit ()
 ;;
 
-let mid ?(scale = 1.0) ~size:((w, h) as size) ~init ~f () =
+let mid ?(scale = 1.0) ~size:((w, h) as size) ~init ~after_display ~f () =
   let f, draw = scale, f in
   let render ~context ~sw ~sh state =
     let lw = float w in
@@ -77,7 +78,7 @@ let mid ?(scale = 1.0) ~size:((w, h) as size) ~init ~f () =
       ~height
       (I.seq [ I.transform (Transform.scale ~sx:(sw *. f) ~sy:(sh *. f)) demo ])
   in
-  low ~size ~init ~f:render
+  low ~size ~init ~after_display ~f:render
 ;;
 
 let high ?scale ~size:((w, h) as size) ~init f =
@@ -92,13 +93,12 @@ let high ?scale ~size:((w, h) as size) ~init f =
       let size = Bonsai.Var.value size_var in
       let driver = Driver.create (f ~mouse ~size userdata) in
       mouse_var, size_var, driver)
+    ~after_display:(fun (_, _, driver) -> Driver.trigger_lifecycles driver)
     ~f:(fun ~mouse ~size (mouse_var, size_var, driver) ->
       Ui_incr.Clock.advance_clock (Driver.clock driver) ~to_:(Core.Time_ns.now ());
       Bonsai.Var.set mouse_var mouse;
       Bonsai.Var.set size_var size;
       Driver.flush driver;
-      let img = Driver.result driver in
-      let () = Driver.trigger_lifecycles driver in
-      img)
+      Driver.result driver)
     ()
 ;;
