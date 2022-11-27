@@ -1223,7 +1223,9 @@ let draw_chart () =
   |> Core.List.concat_mapi ~f:(fun i { center = _; up1; up2; down1; down2; is_red } ->
        let x = Int.to_float i *. (w +. 3.0) in
        let cx = x +. (w /. 2.0) in
-       let color = Paint.color (if is_red then Color.red else Color.green) in
+       let red_color = Color.v_srgbi 232 100 100 in
+       let green_color = Color.v_srgbi 15 232 84 in
+       let color = Paint.color (if is_red then red_color else green_color) in
        let maybe_filled =
          if is_red
          then
