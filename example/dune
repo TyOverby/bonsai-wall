@@ -1,0 +1,5 @@
+(executables
+ (names example minimal blemish colorweb bb)
+ (flags :standard -w -3-6-27)
+ (libraries base tsdl tgls.tgles2 wall)
+ (preprocess (pps ppx_here)))
