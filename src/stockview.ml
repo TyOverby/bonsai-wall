@@ -126,13 +126,13 @@ let draw_chart ~mouse:(mouse_x, _) { Math.max_y; min_y; lh; lw } ~mid_x ~radius 
         [ I.alpha
             0.1
             (I.paint
-               (Paint.color Color.white)
+               (Paint.color Color.blue)
                (I.fill_path (fun ctx ->
                   Path.rect ctx ~x:0.0 ~y:(mod_y down2) ~w:lw ~h:(mod_y up2 -. mod_y down2))))
         ; I.alpha
             0.1
             (I.paint
-               (Paint.color Color.white)
+               (Paint.color Color.blue)
                (I.fill_path (fun ctx ->
                   Path.rect ctx ~x:0.0 ~y:(mod_y down1) ~w:lw ~h:(mod_y up1 -. mod_y down1))))
         ]
