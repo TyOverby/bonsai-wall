@@ -66,7 +66,9 @@ let low
           let x = Sdl.Event.(get event mouse_wheel_x) in
           let y = Sdl.Event.(get event mouse_wheel_y) in
           Some (Mouse_wheel { which = Int32.to_int_exn which; x; y })
-        | _ -> None
+        | other ->
+          print_s [%message (other : Evt.enum)];
+          None
       in
       match evt_opt with
       | None -> ()
