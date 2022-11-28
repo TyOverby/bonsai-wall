@@ -122,19 +122,30 @@ let draw_chart ~mouse:(mouse_x, _) { Math.max_y; min_y; lh; lw } ~mid_x ~radius 
   let hovered =
     match !hovered_candle with
     | Some { up1; down1; up2; down2; _ } ->
+      let outer_path ctx =
+        Path.rect
+          ctx
+          ~x:(-5.0)
+          ~y:(mod_y down2)
+          ~w:(lw +. 10.0)
+          ~h:(mod_y up2 -. mod_y down2)
+      in
+      let inner_path ctx =
+        Path.rect ctx ~x:0.0 ~y:(mod_y down1) ~w:lw ~h:(mod_y up1 -. mod_y down1)
+      in
       I.seq
-        [ I.alpha
-            0.1
-            (I.paint
-               (Paint.color Color.blue)
-               (I.fill_path (fun ctx ->
-                  Path.rect ctx ~x:0.0 ~y:(mod_y down2) ~w:lw ~h:(mod_y up2 -. mod_y down2))))
+        [ I.paint (Paint.color (Color.v_srgbi 0 52 105)) (I.fill_path outer_path)
         ; I.alpha
-            0.1
+            0.2
             (I.paint
-               (Paint.color Color.blue)
-               (I.fill_path (fun ctx ->
-                  Path.rect ctx ~x:0.0 ~y:(mod_y down1) ~w:lw ~h:(mod_y up1 -. mod_y down1))))
+               (Paint.color (Color.v_srgbi 0 125 255))
+               (I.stroke_path Outline.default outer_path))
+        ; I.paint (Paint.color (Color.v_srgbi 0 60 120)) (I.fill_path inner_path)
+        ; I.alpha
+            0.2
+            (I.paint
+               (Paint.color (Color.v_srgbi 0 125 255))
+               (I.stroke_path Outline.default inner_path))
         ]
     | None -> I.empty
   in
